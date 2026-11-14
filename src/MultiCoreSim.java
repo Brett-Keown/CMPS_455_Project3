@@ -2,15 +2,7 @@ import java.util.*;
 import java.util.concurrent.Semaphore;
 
 public class MultiCoreSim {
-    public static void run() throws InterruptedException {
-        //Get input for alg type and # of cores
-        String algorithm = "NSJF";
-        int n_cores = 4; //Make a string
-
-        //Delete after CLI
-        int quantum = 3;
-        //
-
+    public static void run(String algorithm, int quantum, int n_cores) throws InterruptedException {
         Random rand = new Random();
         int taskCount = rand.nextInt(25) + 1;
 
@@ -76,8 +68,5 @@ public class MultiCoreSim {
         finally {
             readyQueue_SEM.release();
         }
-    }
-    public static void main(String[] args) throws InterruptedException{
-        run();
     }
 }

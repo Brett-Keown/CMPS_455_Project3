@@ -15,7 +15,8 @@ public class MultiCoreSim {
 
         //Fork random number of task threads [1,25]
         List<SharedThread> tasks = new ArrayList<>();
-        for(int i = 1 ; i < taskCount; i++){
+
+        for(int i = 1 ; i <= taskCount; i++){
             //Fork Threads with random burst times
             int burstTime = rand.nextInt(50) + 1;
             SharedThread task = new SharedThread(i, burstTime);

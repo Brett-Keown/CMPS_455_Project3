@@ -1,7 +1,7 @@
 public class Main {
 
     public static void main(String[] args) throws InterruptedException {
-
+        MultiCoreSim.run();
     }
 
     public static void CPU(SharedThread task, int cycles) throws InterruptedException {

@@ -4,7 +4,7 @@ import java.util.concurrent.Semaphore;
 public class MultiCoreSim {
     public static void run() throws InterruptedException {
         //Get input for alg type and # of cores
-        String algorithm = "ALG";
+        String algorithm = "alg";
         int n_cores = 4; //Make a string
         Random rand = new Random();
         int taskCount = rand.nextInt(25) + 1;

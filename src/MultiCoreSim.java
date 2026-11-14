@@ -4,26 +4,32 @@ import java.util.concurrent.Semaphore;
 public class MultiCoreSim {
     public static void run() throws InterruptedException {
         //Get input for alg type and # of cores
-        String algorithm = " ";
+        String algorithm = "ALG";
         int n_cores = 4; //Make a string
+        Random rand = new Random();
+        int taskCount = rand.nextInt(25) + 1;
 
         //Initialize Ready Queue
         Queue<SharedThread> readyQueue = new LinkedList<>();
         Semaphore readyQueue_SEM = new Semaphore(1);
 
         //Fork random number of task threads [1,25]
-        Random rand = new Random();
-        for(int i = 0 ; i < rand.nextInt(25) + 1; i++){
+        List<SharedThread> tasks = new ArrayList<>();
+        for(int i = 1 ; i < taskCount; i++){
             //Fork Threads with random burst times
             int burstTime = rand.nextInt(50) + 1;
             SharedThread task = new SharedThread(i, burstTime);
             //Add to ready queue list
             readyQueue_SEM.acquire();
-            readyQueue.add(task);
-            readyQueue_SEM.release();
+            try {
+                readyQueue.add(task);
+            }
+            finally {
+                readyQueue_SEM.release();
+            }
 
             task.start();
-            System.out.println("Creating Process Thread: " + i);
+            System.out.println("Creating Process Thread: " + i + " W/ burst time: " + burstTime);
 
         }
         printReadyQueue(readyQueue, readyQueue_SEM);

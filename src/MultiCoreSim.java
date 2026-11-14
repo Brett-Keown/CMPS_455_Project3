@@ -4,7 +4,7 @@ import java.util.concurrent.Semaphore;
 public class MultiCoreSim {
     public static void run() throws InterruptedException {
         //Get input for alg type and # of cores
-        String algorithm = "alg";
+        String algorithm = "FCFS";
         int n_cores = 4; //Make a string
         Random rand = new Random();
         int taskCount = rand.nextInt(25) + 1;
@@ -35,16 +35,9 @@ public class MultiCoreSim {
         }
         printReadyQueue(readyQueue, readyQueue_SEM);
 
-        //Make Dispatcher threads which are held until all dispatchers are created
 
     }
 
-    public static void dispatch(int dispatchID, String algorithm, Queue<SharedThread> readyQueue, Semaphore readyQueue_SEM){
-        //Select task
-
-        //Select Scheduling Alg
-    }
-    //Print Ready Queue
     public static void printReadyQueue(Queue<SharedThread> readyQueue, Semaphore readyQueue_SEM) throws InterruptedException{
         System.out.println("--------------- Ready Queue ---------------");
         readyQueue_SEM.acquire();

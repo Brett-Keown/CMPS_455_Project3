@@ -4,8 +4,13 @@ import java.util.concurrent.Semaphore;
 public class MultiCoreSim {
     public static void run() throws InterruptedException {
         //Get input for alg type and # of cores
-        String algorithm = "FCFS";
+        String algorithm = "NSJF";
         int n_cores = 4; //Make a string
+
+        //Delete after CLI
+        int quantum = 3;
+        //
+
         Random rand = new Random();
         int taskCount = rand.nextInt(25) + 1;
 
@@ -20,6 +25,7 @@ public class MultiCoreSim {
             //Fork Threads with random burst times
             int burstTime = rand.nextInt(50) + 1;
             SharedThread task = new SharedThread(i, burstTime);
+            tasks.add(task);
             //Add to ready queue list
             readyQueue_SEM.acquire();
             try {
@@ -35,16 +41,43 @@ public class MultiCoreSim {
         }
         printReadyQueue(readyQueue, readyQueue_SEM);
 
-
+        int[] completedTasks = {0};
+        List<CPU> cpus = new ArrayList<>();
+        for (int i = 1; i <= n_cores; i++){
+            CPU cpu = new CPU(i, algorithm, readyQueue, quantum, readyQueue_SEM, completedTasks,
+                    taskCount);
+            cpus.add(cpu);
+            System.out.println("Created CPU " + i);
+        }
+        for (CPU cpu : cpus){
+            cpu.start();
+        }
+        for (CPU cpu : cpus){
+            cpu.join();
+        }
+        for (SharedThread task : tasks){
+            task.join();
+        }
+        System.out.println("All tasks finished");
     }
 
     public static void printReadyQueue(Queue<SharedThread> readyQueue, Semaphore readyQueue_SEM) throws InterruptedException{
-        System.out.println("--------------- Ready Queue ---------------");
         readyQueue_SEM.acquire();
 
-        for(SharedThread task: readyQueue)
-            System.out.println("ID: " + task.getThreadID() + ", Max Burst:" + task.getBurstTime() + ", Current Burst:" + task.getTimeLeft());
-        System.out.println("-------------------------------------------");
-        readyQueue_SEM.release();
+        try {
+            System.out.println("--------------- Ready Queue ---------------");
+
+            for (SharedThread task : readyQueue) {
+                System.out.println("ID: " + task.getThreadID() + ", Max Burst:" + task.getBurstTime() + ", Current Burst:" +
+                        task.getTimeLeft());
+            }
+            System.out.println("-------------------------------------------");
+        }
+        finally {
+            readyQueue_SEM.release();
+        }
+    }
+    public static void main(String[] args) throws InterruptedException{
+        run();
     }
 }

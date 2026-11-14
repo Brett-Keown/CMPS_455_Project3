@@ -9,12 +9,14 @@ public class CPU extends Thread {
     private final int totalTasks;
     private final int[] completedTasks;
     private final Semaphore readyQueue_SEM;
+    private final int quantum;
 
     public CPU(int cpuId, String algorithm, Queue<SharedThread> readyQueue,
-               Semaphore readyQueue_SEM, int[] completedTasks, int totalTasks) {
+               int quantum, Semaphore readyQueue_SEM, int[] completedTasks, int totalTasks) {
         this.cpuId = cpuId;
         this.algorithm = algorithm;
         this.readyQueue = readyQueue;
+        this.quantum = quantum;
         this.readyQueue_SEM = readyQueue_SEM;
         this.completedTasks = completedTasks;
         this.totalTasks = totalTasks;
@@ -22,34 +24,34 @@ public class CPU extends Thread {
 
     private void dispatch() throws InterruptedException {
 
-        int quantum = 5;
         System.out.println("CPU " + cpuId + " running " + algorithm);
 
         while (true) {
             SharedThread task = null;
 
             readyQueue_SEM.acquire();
+            try {
+                if (completedTasks[0] >= totalTasks) {
+                    readyQueue_SEM.release();
+                    return;
+                }
 
-            if (completedTasks[0] >= totalTasks) {
-                readyQueue_SEM.release();
-                return;
-            }
-
-            if (!readyQueue.isEmpty()) {
-                if (algorithm.equals("NSJF")) {
-                    for (SharedThread t : readyQueue) {
-                        if (task == null || t.getTimeLeft() < task.getTimeLeft()) {
-                            task = t;
+                if (!readyQueue.isEmpty()) {
+                    if (algorithm.equals("NSJF")) {
+                        for (SharedThread t : readyQueue) {
+                            if (task == null || t.getTimeLeft() < task.getTimeLeft()) {
+                                task = t;
+                            }
                         }
+                        readyQueue.remove(task);
+                    } else {
+                        task = readyQueue.poll();
                     }
-                    readyQueue.remove(task);
-                } else {
-                    task = readyQueue.poll();
                 }
             }
-
-            readyQueue_SEM.release();
-
+            finally {
+                readyQueue_SEM.release();
+            }
 
             if (task == null) {
                 Thread.sleep(1);
@@ -63,32 +65,31 @@ public class CPU extends Thread {
             System.out.println("Dispatcher " + cpuId + " selected task " + task.getThreadID()
                     + " for " + cycles + " cycle(s).");
 
-            if (task.assignCPU(cycles)) {
-                task.waitForCompletion();
-            }
+            Main.CPU(task, cycles);
 
             readyQueue_SEM.acquire();
+            try {
+                if (task.getTimeLeft() > 0) {
+                    readyQueue.add(task);
+                } else {
+                    completedTasks[0]++;
+                    System.out.println("CPU " + cpuId + " completed Task " + task.getThreadID());
+                }
+            }
+            finally {
+                readyQueue_SEM.release();
+            }
 
-            if (task.getTimeLeft() > 0) {
-                readyQueue.add(task);
-            }
-            else {
-                completedTasks[0]++;
-            }
-            readyQueue_SEM.release();
             MultiCoreSim.printReadyQueue(readyQueue, readyQueue_SEM);
-
-
         }
     }
-}
 
-   /* @Override
+   @Override
     public void run(){
         try {
             dispatch();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-        }*/
-    //}
-//}
+        }
+    }
+}

@@ -25,12 +25,16 @@ public class Main {
 
         String algorithm = configuration.algorithm == 1 ? "FCFS" : "RR";
         SingleCoreSimulator.run(algorithm, configuration.quantum);
+        SingleCoreSimulator.run(new String[]{"NSJF"});
     }
 
     public static void CPU(SharedThread task, int cycles) throws InterruptedException {
         if (task.assignCPU(cycles)) {
             task.waitForCompletion();
         }
+    }
+    public static void CPU(SharedThread task) throws InterruptedException {
+        task.waitForCompletion();
     }
 
     private static Configuration parseArguments(String[] args) {

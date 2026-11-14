@@ -44,6 +44,9 @@ public class SharedThread extends Thread {
             mutex.unlock();
         }
     }
+    public int getCompletedBurst() {
+        return burstTime - getTimeLeft();
+    }
 
     // this function is used in main to make the dispatcher wait until the current task is completed to assign another
     public void waitForCompletion() throws InterruptedException {
@@ -104,6 +107,11 @@ public class SharedThread extends Thread {
                 throw new RuntimeException(e);
             }
 
+            int currentBurst = getCompletedBurst();
+            int burstGoal = Math.min(burstTime, currentBurst + quantum);
+            System.out.printf("%-15s | On CPU: MB=%d, CB=%d, BT=%d, BG:=%d%n",
+                    "Proc. Thread " + ThreadID, burstTime, currentBurst, quantum, burstGoal);
+
             for (int i = 0; i < quantum; i++) {
                 mutex.lock();
 
@@ -116,6 +124,8 @@ public class SharedThread extends Thread {
                 } finally {
                     mutex.unlock();
                 }
+                System.out.printf("%-15s | Using CPU 0; On burst %d.%n",
+                        "Proc. Thread " + ThreadID, getCompletedBurst());
 
                 try {
                     Thread.sleep(10);

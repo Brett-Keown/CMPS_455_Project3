@@ -11,21 +11,29 @@ public class Main {
             return;
         }
 
-        if (configuration.cores != 1) {
-            System.err.println("Error: this simulator currently supports one CPU core.");
-            System.exit(2);
-            return;
+        String algorithm;
+        switch (configuration.algorithm) {
+            case 1:
+                algorithm = "FCFS";
+                break;
+            case 2:
+                algorithm = "RR";
+                break;
+            case 3:
+                algorithm = "SJF";
+                break;
+            case 4:
+                algorithm = "PSJF";
+                break;
+            default:
+                throw new IllegalStateException("Unsupported scheduling algorithm.");
         }
-        if (configuration.algorithm > 2) {
-            System.err.println("Error: scheduling algorithm " + configuration.algorithm
-                    + " is not implemented yet.");
-            System.exit(2);
-            return;
+        if (configuration.cores == 1) {
+            SingleCoreSimulator.run(algorithm, configuration.quantum);
+        } else {
+            MultiCoreSim.run(algorithm.equals("SJF") ? "NSJF" : algorithm,
+                    configuration.quantum, configuration.cores);
         }
-
-        String algorithm = configuration.algorithm == 1 ? "FCFS" : "RR";
-        SingleCoreSimulator.run(algorithm, configuration.quantum);
-        SingleCoreSimulator.run(new String[]{"NSJF"});
     }
 
     public static void CPU(SharedThread task, int cycles) throws InterruptedException {

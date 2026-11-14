@@ -1,8 +1,8 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Non-Preemptive SJF " type="Application" factoryName="Application">
-    <option name="MAIN_CLASS_NAME" value="SingleCoreSimulator" />
+    <option name="MAIN_CLASS_NAME" value="Main" />
     <module name="CMPS_455_Project3" />
-    <option name="PROGRAM_PARAMETERS" value="-S 3 -C 1" />
+    <option name="PROGRAM_PARAMETERS" value="-S 3 -C 2" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

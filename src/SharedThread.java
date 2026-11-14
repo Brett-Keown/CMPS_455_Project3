@@ -116,6 +116,12 @@ public class SharedThread extends Thread {
                 } finally {
                     mutex.unlock();
                 }
+
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
             }
             done.release();
         }

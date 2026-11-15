@@ -7,6 +7,7 @@ public class SharedThread extends Thread {
     private final int burstTime;
     private int timeLeft;
     private int quantum;
+    private int cpuID;
 
     // this boolean tracks whether a task is actively assigned to a cpu
     // in multi core implementation prevents duplicate assignment
@@ -63,7 +64,7 @@ public class SharedThread extends Thread {
 
     // allows execution on cpu if it is not already assigned or completed
     // duration based on quantumVal
-    public boolean assignCPU(int quantumVal) {
+    public boolean assignCPU(int quantumVal, int cpuID) {
         mutex.lock();
 
         try {
@@ -74,12 +75,18 @@ public class SharedThread extends Thread {
             assigned = true;
             psjfInterrupt = false;
             quantum = Math.min(quantumVal, timeLeft);
+            this.cpuID = cpuID;
+
             execute.release();
             return true;
 
         } finally {
             mutex.unlock();
         }
+    }
+
+    public boolean assignCPU(int quantumVal){
+        return assignCPU(quantumVal, 0);
     }
 
     // should allow premption for psjf algorithm
@@ -124,8 +131,8 @@ public class SharedThread extends Thread {
                 } finally {
                     mutex.unlock();
                 }
-                System.out.printf("%-15s | Using CPU 0; On burst %d.%n",
-                        "Proc. Thread " + ThreadID, getCompletedBurst());
+                System.out.printf("%-15s | Using CPU %d; On burst %d.%n",
+                        "Proc. Thread " + ThreadID, cpuID, getCompletedBurst());
 
                 try {
                     Thread.sleep(10);

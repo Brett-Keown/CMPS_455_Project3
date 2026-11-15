@@ -1,6 +1,6 @@
 public class Main {
 
-    public static void main(String[] args) throws InterruptedException {
+ public static void main(String[] args) throws InterruptedException {
         Configuration configuration;
         try {
             configuration = parseArguments(args);
@@ -38,6 +38,11 @@ public class Main {
 
     public static void CPU(SharedThread task, int cycles) throws InterruptedException {
         if (task.assignCPU(cycles)) {
+            task.waitForCompletion();
+        }
+    }
+    public static void CPU(SharedThread task, int cycles, int cpuId) throws InterruptedException{
+        if (task.assignCPU(cycles, cpuId)){
             task.waitForCompletion();
         }
     }

@@ -65,7 +65,7 @@ public class CPU extends Thread {
             System.out.println("Dispatcher " + cpuId + " selected task " + task.getThreadID()
                     + " for " + cycles + " cycle(s).");
 
-            Main.CPU(task, cycles);
+            Main.CPU(task, cycles, cpuId);
 
             readyQueue_SEM.acquire();
             try {
